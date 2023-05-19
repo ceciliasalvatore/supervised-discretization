@@ -9,7 +9,7 @@ An active Gurobi Licence is needed to run the code.
 
 * The package can be installed with the command:
 ```
-pip install supervised-discretization
+pip install SupervisedDiscretization
 ```
 
 ## Hyperparameters
@@ -33,7 +33,7 @@ We report an example on how to use the FCCA procedure on new data. The example c
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.ensemble import GradientBoostingClassifier
-from discretize import FCCA
+from SupervisedDiscretization.discretize import FCCA
 
 # Reading the dataset
 data = pd.read_csv('datasets/boston.csv')
