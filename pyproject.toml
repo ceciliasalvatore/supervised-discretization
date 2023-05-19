@@ -1,0 +1,23 @@
+[build-system]
+requires = [
+    "setuptools>=60",
+    "setuptools",
+    "pandas",
+    "sklearn",
+    "gurobipy"
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "SupervisedDiscretization"
+version = "0.0.1"
+authors = [
+  { name="Cecilia Salvatore", email="cecilia.salvatore@uniroma2.it" },
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+readme = "README.md"
+requires-python = ">=3.7"
