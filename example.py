@@ -1,7 +1,7 @@
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.ensemble import GradientBoostingClassifier
-from SupervisedDiscretization import FCCA
+from SupervisedDiscretization.discretizer import FCCA
 
 if __name__ == '__main__':
     # Reading the dataset

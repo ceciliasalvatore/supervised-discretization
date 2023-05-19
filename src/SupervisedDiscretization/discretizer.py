@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import time
 from sklearn.model_selection import GridSearchCV
-from CounterfactualAnalysis import CounterfactualExplanation
+from SupervisedDiscretization.CounterfactualAnalysis.counterfactualExplanations import CounterfactualExplanation
 
 class Discretizer:
     def fit(self, x, y):
@@ -87,7 +87,7 @@ class FCCA(Discretizer):
 
     def fit(self, x, y):
         if np.any(np.min(x)<0) or np.any(np.min(x)>1):
-            raise Exception('Data must be scaled between 0 and 1 to apply the SupervisedDiscretization discretizer')
+            raise Exception('Data must be scaled between 0 and 1 to apply the discretizers discretizer')
         t0 = time.time()
         self.estimator.fit(x, y)
 
@@ -101,7 +101,7 @@ class FCCA(Discretizer):
         if self.compress:
             self.tao = self.compressThresholds(self.tao)
 
-        print(f'Time needed for fitting the SupervisedDiscretization discretizer: {time.time()-t0} seconds')
+        print(f'Time needed for fitting the discretizers discretizer: {time.time()-t0} seconds')
 
     def selectThresholds(self, Q):
         threshold_importance = np.quantile(self.tao['Count'], Q)

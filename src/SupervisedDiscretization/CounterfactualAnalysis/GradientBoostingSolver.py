@@ -1,6 +1,6 @@
 from gurobipy import quicksum
 
-from CounterfactualAnalysis.TreeEnsembleSolver import CESolver_TreeEnsemble
+from SupervisedDiscretization.CounterfactualAnalysis.TreeEnsembleSolver import CESolver_TreeEnsemble
 
 class CESolver_GradientBoosting(CESolver_TreeEnsemble):
     def __init__(self, estimator, lambda0, lambda1, lambda2, eps, timelimit):

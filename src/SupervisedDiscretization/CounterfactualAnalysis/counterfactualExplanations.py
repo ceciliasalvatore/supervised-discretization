@@ -1,10 +1,9 @@
-import time
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.svm import LinearSVC, SVC
 
-from CounterfactualAnalysis.RandomForestSolver import CESolver_RandomForest
-from CounterfactualAnalysis.SVCSolver import CESolver_SVC
-from CounterfactualAnalysis.GradientBoostingSolver import CESolver_GradientBoosting
+from SupervisedDiscretization.CounterfactualAnalysis.RandomForestSolver import CESolver_RandomForest
+from SupervisedDiscretization.CounterfactualAnalysis.SVCSolver import CESolver_SVC
+from SupervisedDiscretization.CounterfactualAnalysis.GradientBoostingSolver import CESolver_GradientBoosting
 
 class CounterfactualExplanation():
     def __init__(self, estimator, lambda0, lambda1, lambda2, eps, timelimit):

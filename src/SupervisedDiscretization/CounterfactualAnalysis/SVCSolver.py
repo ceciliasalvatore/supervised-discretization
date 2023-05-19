@@ -1,6 +1,6 @@
 from sklearn.svm import SVC
 from gurobipy import quicksum
-from CounterfactualAnalysis.gurobiSolver import CESolver
+from SupervisedDiscretization.CounterfactualAnalysis.gurobiSolver import CESolver
 
 class CESolver_SVC(CESolver):
     def __init__(self, estimator, lambda0, lambda1, lambda2, eps, timelimit):

@@ -1,8 +1,7 @@
 import numpy as np
-from sklearn import tree
 from gurobipy import GRB
 
-from CounterfactualAnalysis.gurobiSolver import CESolver
+from SupervisedDiscretization.CounterfactualAnalysis.gurobiSolver import CESolver
 
 class CESolver_TreeEnsemble(CESolver):
     def __init__(self, estimator, lambda0, lambda1, lambda2, eps, timelimit):
