@@ -1,20 +1,19 @@
 import pandas as pd
+import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.ensemble import GradientBoostingClassifier
 from SupervisedDiscretization.discretizer import FCCA
 
 if __name__ == '__main__':
+
+    np.random.seed(100)
     # Reading the dataset
     data = pd.read_csv('datasets/boston.csv')
     label_column = data.columns[-1]
     feature_columns = data.columns[:-1]
 
-    # Scaling the features between 0 and 1
-    scaler = MinMaxScaler()
-    data[feature_columns] = scaler.fit_transform(data[feature_columns])
-
     # Train - test split
-    data_ts = data.sample(n=int(0.3*len(data)))
+    data_ts = data.sample(n=int(0.3*len(data)), random_state=101)
     data_tr = data.drop(index=data_ts.index)
 
     x_tr, y_tr = data_tr[feature_columns], data_tr[label_column]

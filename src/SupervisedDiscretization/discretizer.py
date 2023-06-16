@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import time
+from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import GridSearchCV
 from SupervisedDiscretization.CounterfactualAnalysis.counterfactualExplanations import CounterfactualExplanation
 
@@ -74,7 +75,7 @@ class TotalDiscretizer(Discretizer):
         return tao_c
 
 class FCCA(Discretizer):
-    def __init__(self, estimator, p0=0.5, p1=1, lambda0=0.1, lambda1=1, lambda2=0.0, compress=True, timelimit=1*60):
+    def __init__(self, estimator, p0=0.5, p1=1, lambda0=0.1, lambda1=1, lambda2=0.0, compress=True, timelimit=1*60, verbose=True):
         super().__init__()
         self.estimator = estimator
         self.p0 = p0
@@ -84,11 +85,14 @@ class FCCA(Discretizer):
         self.lambda2 = lambda2
         self.compress = compress
         self.timelimit = timelimit
+        self.verbose = verbose
 
     def fit(self, x, y):
-        if np.any(np.min(x)<0) or np.any(np.min(x)>1):
-            raise Exception('Data must be scaled between 0 and 1 to apply the discretizers discretizer')
         t0 = time.time()
+
+        x = x.copy()
+        scaler = MinMaxScaler()
+        x[x.columns] = scaler.fit_transform(x)
         self.estimator.fit(x, y)
 
         if isinstance(self.estimator, GridSearchCV):
@@ -96,12 +100,18 @@ class FCCA(Discretizer):
 
         eps = self.GetTollerance(x)
         x0, y0 = self.getRelevant(x, y)
+        if self.verbose:
+            print(f"Number of CEs to compute: {len(x0)}")
         xCE, yCE = self.getCounterfactualExplanations(x0, y0, eps)
+
+        x0[x0.columns] = scaler.inverse_transform(x0)
+        xCE[xCE.columns] = scaler.inverse_transform(xCE)
         self.tao = self.getCounterfactualThresholds(x0, xCE, eps)
         if self.compress:
             self.tao = self.compressThresholds(self.tao)
 
-        print(f'Time needed for fitting the discretizers discretizer: {time.time()-t0} seconds')
+        if self.verbose:
+            print(f'Time needed for fitting the discretizers discretizer: {time.time()-t0} seconds')
 
     def selectThresholds(self, Q):
         threshold_importance = np.quantile(self.tao['Count'], Q)
@@ -136,7 +146,7 @@ class FCCA(Discretizer):
         return thresholds
 
     def getCounterfactualExplanations(self, x0, y0, eps):
-        solver = CounterfactualExplanation(self.estimator, lambda0=self.lambda0, lambda1=self.lambda1, lambda2=self.lambda2, eps=eps, timelimit=self.timelimit)
+        solver = CounterfactualExplanation(self.estimator, lambda0=self.lambda0, lambda1=self.lambda1, lambda2=self.lambda2, eps=eps, timelimit=self.timelimit, verbose=self.verbose)
         xCE, yCE = solver.compute(x0, y0)
         return xCE, yCE
 
