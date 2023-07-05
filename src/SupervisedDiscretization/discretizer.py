@@ -74,6 +74,25 @@ class TotalDiscretizer(Discretizer):
         tao_c['Feature'] = c
         return tao_c
 
+
+class BucketDiscretizer(Discretizer):
+    def fit(self, x, y):
+        self.tao = pd.DataFrame(columns=['Feature','Threshold'])
+        for i in x.columns:
+            self.tao = pd.concat((self.tao,self.getAllThresholds(x, y, i)))
+
+    def getAllThresholds(self, x, y, c):
+        tao_c = pd.DataFrame(columns=['Feature','Threshold'])
+        x_c, i_c = np.unique(x[c], return_index=True)
+        i_c = i_c[np.argsort(x_c)]
+        x_c = x[c].iloc[i_c].to_numpy()
+        y_c = y.iloc[i_c].to_numpy()
+        t = x_c[:-1] + (x_c[1:] - x_c[:-1]) / 2
+        mask = (y_c[1:] - y_c[:-1]) != 0
+        tao_c['Threshold'] = t[mask]
+        tao_c['Feature'] = c
+        return tao_c
+
 class FCCA(Discretizer):
     def __init__(self, estimator, p0=0.5, p1=1, lambda0=0.1, lambda1=1, lambda2=0.0, compress=True, timelimit=1*60, verbose=True):
         super().__init__()

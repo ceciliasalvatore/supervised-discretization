@@ -3,14 +3,14 @@ requires = [
     "setuptools>=60",
     "setuptools",
     "pandas",
-    "sklearn",
+    "scikit-learn",
     "gurobipy"
 ]
 build-backend = "setuptools.build_meta"
 [tool.setuptools]
 [project]
 name = "SupervisedDiscretization"
-version = "0.0.1"
+version = "0.0.3"
 authors = [
   { name="Cecilia Salvatore", email="cecilia.salvatore@uniroma2.it" },
 ]
