@@ -1,16 +1,31 @@
 # supervised-discretization
 
-This repository contains the code for the paper <a href="https://doi.org/10.1016/j.ejor.2023.11.019">Supervised Feature Compression based on Counterfactual Analysis</a>
+This repository contains the code for several Supervised Discretization methods. Supervised Discretization is a technique that transforms continuous features of a machine learning dataset into a set of binary features. Please note that only binary classification datasets are considered in this repository.
+
+Here is a list of the discretization methods implemented:
+* TotalDiscretizer: on each feature, a cutting point is considered between each couple of consecutive data points in the training set;
+* BucketDiscretizer: on each feature, a cutting point is considered between each couple of consecutive data points in the training set with a different label;
+* QuantileDiscretizer: on each feature, cutting points are generated as quantiles of the feature values; the hyperparameter **n** denotes the number of cutting points generated on each feature;
+* FCCA: implements the discretization technique based on Counterfactual Analysis as presented in paper <a href="https://www.sciencedirect.com/science/article/pii/S0377221723008603">Supervised Feature Compression based on Counterfactual Analysis</a>
 
 ## Installation
 
-* The MILP problem for computing the Counterfactual Explanation for a point is implemented in <a href="https://www.gurobi.com/solutions/gurobi-optimizer/?campaignid=18262689303&adgroupid=138243449982&creative=620260718865&keyword=gurobi&matchtype=e&gclid=Cj0KCQiA4OybBhCzARIsAIcfn9mYA1eyslmYMVKkmSzUWuZeLKwpNXdPrcIoKLnEr60zcnHFDSpc5j8aAgzgEALw_wcB">Gurobi</a>.
-An active Gurobi Licence is needed to run the code.
+* The FCCA discretizer is based on the resolution of an optimization problem, the Counterfactual Explanation problem. The MILP problem for computing the Counterfactual Explanation for a point is implemented in <a href="https://www.gurobi.com/solutions/gurobi-optimizer/?campaignid=18262689303&adgroupid=138243449982&creative=620260718865&keyword=gurobi&matchtype=e&gclid=Cj0KCQiA4OybBhCzARIsAIcfn9mYA1eyslmYMVKkmSzUWuZeLKwpNXdPrcIoKLnEr60zcnHFDSpc5j8aAgzgEALw_wcB">Gurobi</a>.
+An active Gurobi Licence is needed to use FCCA.
 
 * The package can be installed with the command:
 ```
 pip install SupervisedDiscretization
 ```
+
+## Methods
+Each discretization method offers the following methods:
+* **fit**: method for fitting the procedure;
+* **transform**: method for discretizing a dataset by using the set of thresholds previously computed via the **fit** method;
+* **fit_transform**: method for applying in sequence the **fit** and **transform** methods;
+
+The FCCA class also offers the following method:
+* **selectThresholds**: method for setting a different value of Q after the **fit** has been called; this method allows to subsample the set of thresholds in a fast way without recomputing the FCCA procedure.
 
 ## Hyperparameters
 The implementation of the FCCA procedure can be found in the file *discretize.py* that contains the Python class *FCCA* which takes the following parameters:
@@ -18,17 +33,10 @@ The implementation of the FCCA procedure can be found in the file *discretize.py
 * **p0**, **p1**: lower and upper bound for the classification probability of points for which computing the Counterfactual Explanation; 
 * **lambda0**, **lambda1**, **lambda2**: hyperparameters for the Counterfactual Explanation problem that represents respectively the weights for the l0-, l1- and l2- norm;
 * **compress**: boolean that is set to True to merge thresholds whose absolute difference is smaller than 0.01;
-* **timelimit**: time limit in seconds for solving the Counterfactual Explanations problem;
-* **verbose**: boolean that is set to True to print some informations about the process of fitting the FCCA procedure.
-
-The FCCA class offers the following methods:
-* **fit**: method for fitting the FCCA procedure;
-* **transform**: method for discretizing a dataset by using the set of thresholds previously computed via the **fit** method;
-* **fit_transform**: method for applying in sequence the **fit** and **transform** methods;
-* **selectThresholds**: method for setting a different value of Q after the **fit** has been called; this method allows to subsample the set of thresholds in a fast way without recomputing the FCCA procedure.
+* **timelimit**: time limit in seconds for solving the Counterfactual Explanations problem.
 
 ## Execution
-We report an example on how to use the FCCA procedure on new data. The example can also be found in the file *example.py*
+We report an example on how to use the FCCA procedure. The example can also be found in the file *example.py*
 
 ```
 import pandas as pd
@@ -73,4 +81,5 @@ if __name__ == '__main__':
     # Compression - inconsistency rate
     print(f'Compression rate: {discretizer.compression_rate(x_ts, y_ts, tao_q)}')
     print(f'Inconsistency rate: {discretizer.inconsistency_rate(x_ts, y_ts, tao_q)}')
+
 ```
