@@ -32,15 +32,9 @@ class Discretizer:
         if tao is None:
             tao = self.tao
         x_discr, y_discr = self.transform(x, y, tao)
-        u = np.sort(np.unique(x_discr,axis=0,return_index=True)[1])
-        count = 0
-        for i in range(len(x_discr)):
-            if i in u:
-                si = np.where((x_discr==x_discr.iloc[i]).all(axis=1))[0]
-                yy, cc = np.unique(y.iloc[si], return_counts=True)
-                if len(yy) > 1:
-                    count += np.min(cc)
-        inconsistency_rate = count / len(x_discr)
+        x_discr['y'] = y_discr.values
+        inconsistency_rate = x_discr.groupby(x_discr.columns[:-1].to_list()).agg(min_count=(x_discr.columns[-1], lambda x: min(np.count_nonzero(x == 0), np.count_nonzero(x == 1))))['min_count'].sum() / len(x_discr)
+
         return inconsistency_rate
 
     @staticmethod
@@ -86,10 +80,30 @@ class BucketDiscretizer(Discretizer):
         x_c, i_c = np.unique(x[c], return_index=True)
         i_c = i_c[np.argsort(x_c)]
         x_c = x[c].iloc[i_c].to_numpy()
-        y_c = y.iloc[i_c].to_numpy()
+        y_c = y.iloc[i_c].to_numpy().flatten()
         t = x_c[:-1] + (x_c[1:] - x_c[:-1]) / 2
         mask = (y_c[1:] - y_c[:-1]) != 0
         tao_c['Threshold'] = t[mask]
+        tao_c['Feature'] = c
+        return tao_c
+
+class QuantileDiscretizer(Discretizer):
+    def __init__(self, n=100, *args, **kwargs):
+        self.n = n
+        super().__init__(*args, **kwargs)
+
+    def fit(self, x, y):
+        self.tao = pd.DataFrame(columns=['Feature','Threshold'])
+        for i in x.columns:
+            self.tao = pd.concat((self.tao,self.getAllThresholds(x, i)))
+
+    def getAllThresholds(self, x, c):
+        thresholds = []
+        for i in np.arange(0,1,1/self.n):
+            thresholds.append(np.quantile(x[c], i))
+        thresholds = np.unique(thresholds)
+        tao_c = pd.DataFrame(columns=['Feature','Threshold'])
+        tao_c['Threshold'] = thresholds
         tao_c['Feature'] = c
         return tao_c
 
